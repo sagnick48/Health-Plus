@@ -1,0 +1,25 @@
+name: Integration Pipeline
+on: 
+    push: 
+        branches: ["main"]
+    pull_request:
+        branches: ["main"]
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                node-version: [18.0, 20.0, 22.0]
+        steps:
+            - uses: actions/checkout@v4
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v4
+              with:
+                node-version: ${{ matrix.node-version }}
+                cache: 'npm'
+            - name: Install npm dependencies
+              run: timeout 30s npm i || true
+            - name: Build
+              run: npm run build
+            - name: Test the Update
+              run: npm test
